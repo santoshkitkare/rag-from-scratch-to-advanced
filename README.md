@@ -8,8 +8,7 @@ A scalable and extensible Retrieval-Augmented Generation (RAG) system designed t
 - 🔍 **Multiple Retrieval Strategies**: 
   - Basic semantic search
   - Hybrid search (semantic + keyword)
-  - Re-ranking capabilities
-  - Contextual compression
+  - Extensible architecture for adding more strategies
 - 💬 **Interactive Chat UI**: User-friendly Streamlit interface
 - 🧠 **LLM Integration**: Support for OpenAI, Anthropic, and Cohere models
 - 📊 **Vector Store Options**: FAISS and ChromaDB support
@@ -98,11 +97,12 @@ Traditional vector similarity search using embeddings.
 ### 2. Hybrid Search
 Combines semantic search with keyword-based search (BM25) for better accuracy.
 
-### 3. Re-ranking
-Applies a re-ranking model to improve the relevance of retrieved chunks.
-
-### 4. Contextual Compression
-Compresses retrieved documents to include only relevant information.
+### Extensibility
+The system is designed to easily add new retrieval strategies such as:
+- Re-ranking with dedicated models
+- Contextual compression
+- Multi-query retrieval
+- Parent-document retrieval
 
 ## Configuration
 

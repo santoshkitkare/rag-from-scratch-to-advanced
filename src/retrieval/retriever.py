@@ -4,13 +4,8 @@ Retrieval strategies for RAG.
 from typing import List, Optional
 from enum import Enum
 
-from langchain.schema import Document
-from langchain.retrievers import (
-    ContextualCompressionRetriever,
-)
-from langchain.retrievers.document_compressors import LLMChainExtractor
+from langchain_core.documents import Document
 from langchain_community.retrievers import BM25Retriever
-from langchain.retrievers.ensemble import EnsembleRetriever
 
 from .vector_store import VectorStoreManager
 
@@ -19,7 +14,6 @@ class RetrievalStrategy(str, Enum):
     """Available retrieval strategies."""
     SEMANTIC = "semantic"
     HYBRID = "hybrid"
-    CONTEXTUAL_COMPRESSION = "contextual_compression"
 
 
 class Retriever:
@@ -63,7 +57,7 @@ class Retriever:
         
         Args:
             query: Query string
-            llm: Language model (required for some strategies)
+            llm: Language model (optional, for future use)
             
         Returns:
             List of retrieved documents
@@ -73,11 +67,6 @@ class Retriever:
         
         elif self.strategy == RetrievalStrategy.HYBRID:
             return self._hybrid_search(query)
-        
-        elif self.strategy == RetrievalStrategy.CONTEXTUAL_COMPRESSION:
-            if llm is None:
-                raise ValueError("LLM required for contextual compression")
-            return self._contextual_compression(query, llm)
         
         else:
             raise ValueError(f"Unknown retrieval strategy: {self.strategy}")
@@ -111,43 +100,23 @@ class Retriever:
             # Fallback to semantic search if no documents cached
             return self._semantic_search(query)
         
-        # Semantic retriever
-        semantic_retriever = self.vector_store_manager.get_retriever(
-            search_kwargs={"k": self.top_k}
-        )
+        # Get semantic results
+        semantic_docs = self._semantic_search(query)
         
-        # BM25 retriever for keyword search
+        # Get BM25 results
         bm25_retriever = BM25Retriever.from_documents(self._documents_cache)
         bm25_retriever.k = self.top_k
+        bm25_docs = bm25_retriever.get_relevant_documents(query)
         
-        # Ensemble retriever combining both
-        ensemble_retriever = EnsembleRetriever(
-            retrievers=[semantic_retriever, bm25_retriever],
-            weights=[0.5, 0.5]  # Equal weights
-        )
+        # Combine results (simple merge, remove duplicates)
+        seen_content = set()
+        combined_docs = []
         
-        return ensemble_retriever.get_relevant_documents(query)
-    
-    def _contextual_compression(self, query: str, llm) -> List[Document]:
-        """
-        Perform retrieval with contextual compression.
+        for doc in semantic_docs + bm25_docs:
+            if doc.page_content not in seen_content:
+                seen_content.add(doc.page_content)
+                combined_docs.append(doc)
+                if len(combined_docs) >= self.top_k:
+                    break
         
-        Args:
-            query: Query string
-            llm: Language model for compression
-            
-        Returns:
-            List of compressed, relevant documents
-        """
-        base_retriever = self.vector_store_manager.get_retriever(
-            search_kwargs={"k": self.top_k * 2}  # Retrieve more, then compress
-        )
-        
-        compressor = LLMChainExtractor.from_llm(llm)
-        
-        compression_retriever = ContextualCompressionRetriever(
-            base_compressor=compressor,
-            base_retriever=base_retriever
-        )
-        
-        return compression_retriever.get_relevant_documents(query)
+        return combined_docs[:self.top_k]

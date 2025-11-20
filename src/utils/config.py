@@ -2,11 +2,13 @@
 Configuration management for the RAG system.
 """
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class RAGConfig(BaseModel):
     """Configuration for RAG system parameters."""
+    
+    model_config = ConfigDict(extra="allow")
     
     # Document processing
     chunk_size: int = Field(default=1000, description="Size of text chunks")
@@ -29,7 +31,3 @@ class RAGConfig(BaseModel):
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     cohere_api_key: Optional[str] = None
-    
-    class Config:
-        """Pydantic config."""
-        extra = "allow"

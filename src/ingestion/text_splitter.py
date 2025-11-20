@@ -3,11 +3,11 @@ Text splitting utilities for chunking documents.
 """
 from typing import List
 
-from langchain.text_splitter import (
+from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
     CharacterTextSplitter,
 )
-from langchain.schema import Document
+from langchain_core.documents import Document
 
 
 class TextSplitter:

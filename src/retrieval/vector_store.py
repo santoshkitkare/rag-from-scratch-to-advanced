@@ -5,9 +5,9 @@ import os
 from typing import List, Optional
 from pathlib import Path
 
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS, Chroma
-from langchain.embeddings.base import Embeddings
+from langchain_core.embeddings import Embeddings
 
 
 class VectorStoreManager:

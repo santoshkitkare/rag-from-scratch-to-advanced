@@ -126,8 +126,7 @@ def query_rag_system(query: str, config: RAGConfig):
         )
         
         # Retrieve documents
-        llm = llm_manager.get_llm() if config.retrieval_strategy == "contextual_compression" else None
-        retrieved_docs = retriever.retrieve(query, llm=llm)
+        retrieved_docs = retriever.retrieve(query)
         
         # Generate response
         result = llm_manager.generate_response(query, retrieved_docs)
@@ -180,7 +179,7 @@ st.sidebar.markdown("---")
 st.sidebar.subheader("🔍 Retrieval Settings")
 retrieval_strategy = st.sidebar.selectbox(
     "Retrieval Strategy",
-    options=["semantic", "hybrid", "contextual_compression"],
+    options=["semantic", "hybrid"],
     index=0,
     help="Strategy for document retrieval"
 )

@@ -3,7 +3,7 @@ Basic tests for RAG system components.
 """
 import pytest
 from pathlib import Path
-from langchain.schema import Document
+from langchain_core.documents import Document
 
 from src.ingestion.document_loader import DocumentLoader
 from src.ingestion.text_splitter import TextSplitter

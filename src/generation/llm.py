@@ -2,10 +2,9 @@
 LLM integration for response generation.
 """
 from typing import List, Optional
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain_community.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 
 class LLMManager:
@@ -101,23 +100,6 @@ Helpful Answer:"""
             "answer": response,
             "sources": sources
         }
-    
-    def create_qa_chain(self, retriever):
-        """
-        Create a RetrievalQA chain.
-        
-        Args:
-            retriever: Document retriever
-            
-        Returns:
-            RetrievalQA chain
-        """
-        return RetrievalQA.from_chain_type(
-            llm=self.llm,
-            chain_type="stuff",
-            retriever=retriever,
-            return_source_documents=True
-        )
     
     def get_llm(self):
         """

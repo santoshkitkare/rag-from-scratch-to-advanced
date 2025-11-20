@@ -4,7 +4,7 @@ Embedding generation utilities.
 from typing import List
 
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain.embeddings.base import Embeddings
+from langchain_core.embeddings import Embeddings
 
 
 class EmbeddingModel:
